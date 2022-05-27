@@ -12,6 +12,7 @@ struct packet {
 typedef struct packet packet_t;
 
 static packet_t packet;
+static unsigned long start;
 
 void setup() {
   Serial.begin(115200);
@@ -27,21 +28,35 @@ void setup() {
   setRgbLedColor(LED_COLOR_GREEN);
 
 
+  memset(&packet, 0, sizeof(packet_t));
   packet.begin = 0xAAAA;
   packet.end = 0x5555;
   packet.frame = 0;
+
+  start = millis();
 }
 
 void loop() {
+  float delta;
 
-  if (IMU.gyroscopeAvailable()) {
-    IMU.readGyroscope(packet.gyro[1], packet.gyro[2], packet.gyro[0]);
+  if (IMU.accelerationAvailable()) {
+    float x, y, z;
+    IMU.readAcceleration(x, y, z);
+    packet.gyro[1] = (atan(y / sqrt((x * x) + (z * z))) * 180.0f) / PI;
+    packet.gyro[2] = (atan(-x / sqrt((y * y) + (z * z))) * 180.0f) / PI;
   }
-  
-  Serial.write((uint8_t*) &packet, sizeof(packet));
-  
+  if (IMU.gyroscopeAvailable()) {
+    float pitch, roll, yaw;
+    delta = ((float)(millis() - start)) / 1000.0f;
+    IMU.readGyroscope(pitch, roll, yaw);
+    if (abs(yaw) > 1.0f)
+      packet.gyro[0] += yaw * delta;
+    start = millis();
+  }
+
+  Serial.write((uint8_t*) &packet, 30);
+
   if (++packet.frame > 999) {
     packet.frame = 0;
   }
-
 }
