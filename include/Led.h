@@ -2,8 +2,7 @@
 
 #include <Arduino.h>
 
-typedef enum
-{
+typedef enum {
     LED_COLOR_BLACK = 0b000,
     LED_COLOR_BLUE = 0b001,
     LED_COLOR_GREEN = 0b010,
