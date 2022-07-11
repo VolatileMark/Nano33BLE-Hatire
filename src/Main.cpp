@@ -58,6 +58,7 @@ void update() {
   Vector3f g;
   IMU.readGyroscope(g.x, g.y, g.z);
 
+  // https://www.mathworks.com/videos/sensor-fusion-part-2-fusing-a-mag-accel-and-gyro-to-estimate-orientation-1569411056638.html
   Vector3f n, e, d;
   d = -a.norm();
   e = d.cross(m.norm());
@@ -69,6 +70,7 @@ void update() {
     { n.z, e.z, d.z }
   };
   
+  // https://www.vectornav.com/resources/inertial-navigation-primer/math-fundamentals/math-attitudetran
   float y1 = atan(dcm[0][1] / dcm[0][0]) * RAD_TO_DEG;
   float p1 = asin(dcm[0][2]) * RAD_TO_DEG;
   float r1 = atan(dcm[1][2] / dcm[2][2]) * RAD_TO_DEG;
