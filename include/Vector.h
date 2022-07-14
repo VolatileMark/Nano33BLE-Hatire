@@ -11,6 +11,10 @@ public:
   Vector3f operator-() const;
   Vector3f operator+(const Vector3f& vec) const;
   Vector3f operator-(const Vector3f& vec) const;
+  Vector3f operator/(const float vec) const;
+  Vector3f& operator+=(const Vector3f& vec);
+  Vector3f& operator-=(const Vector3f& vec);
+  Vector3f& operator/=(const float v);
   Vector3f cross(const Vector3f& vec) const;
   Vector3f norm() const;
   float dot(const Vector3f& vec) const;

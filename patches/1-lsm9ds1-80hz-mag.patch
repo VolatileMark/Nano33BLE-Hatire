@@ -2,3 +2,7 @@
 <   writeRegister(LSM9DS1_ADDRESS_M, LSM9DS1_CTRL_REG1_M, 0xb4); // Temperature compensation enable, medium performance, 20 Hz
 ---
 >   writeRegister(LSM9DS1_ADDRESS_M, LSM9DS1_CTRL_REG1_M, 0xbc); // Temperature compensation enable, medium performance, 80 Hz
+212c212
+<   return 20.0;
+---
+>   return 80.0F;

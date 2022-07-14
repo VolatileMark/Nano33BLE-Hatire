@@ -26,6 +26,34 @@ Vector3f Vector3f::operator-(const Vector3f& vec) const {
   return (*this + (-vec));
 }
 
+Vector3f Vector3f::operator/(const float v) const {
+  Vector3f vec(
+    this->x / v,
+    this->y / v,
+    this->z / v
+  );
+  return vec;
+}
+
+Vector3f& Vector3f::operator+=(const Vector3f& vec) {
+  this->x += vec.x;
+  this->y += vec.y;
+  this->z += vec.z;
+  return *this;
+}
+
+Vector3f& Vector3f::operator-=(const Vector3f& vec) {
+  *this += -vec;
+  return *this;
+}
+
+Vector3f& Vector3f::operator/=(const float v) {
+  this->x /= v;
+  this->y /= v;
+  this->z /= v;
+  return *this;
+}
+
 Vector3f Vector3f::cross(const Vector3f& vec) const {
   Vector3f v(
     (y * vec.z) - (z * vec.y), 
@@ -34,7 +62,6 @@ Vector3f Vector3f::cross(const Vector3f& vec) const {
   );
   return v;
 }
-
 
 float Vector3f::dot(const Vector3f& vec) const {
   return ((x * vec.x) + (y * vec.y) + (z * vec.z));

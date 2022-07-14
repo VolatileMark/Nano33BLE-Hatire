@@ -12,7 +12,6 @@ struct packet {
 typedef struct packet packet_t;
 
 static packet_t packet;
-
 static unsigned long startT;
 
 #define yaw packet.gyro[0]
@@ -52,43 +51,39 @@ void update() {
   Vector3f a;
   IMU.readAcceleration(a.x, a.y, a.z);
 
-  Vector3f m;
-  IMU.readMagneticField(m.x, m.y, m.z);
-
   Vector3f g;
   IMU.readGyroscope(g.x, g.y, g.z);
 
+  Vector3f m;
+  IMU.readMagneticField(m.x, m.y, m.z);
+  m.x = -m.x;
+  
   // https://www.mathworks.com/videos/sensor-fusion-part-2-fusing-a-mag-accel-and-gyro-to-estimate-orientation-1569411056638.html
   Vector3f n, e, d;
   d = -a.norm();
   e = d.cross(m.norm());
   n = e.cross(d);
 
-  float dcm[3][3] = {
-    { n.x, e.x, d.x },
-    { n.y, e.y, d.y },
-    { n.z, e.z, d.z }
-  };
-  
   // https://www.vectornav.com/resources/inertial-navigation-primer/math-fundamentals/math-attitudetran
-  float y1 = atan(dcm[0][1] / dcm[0][0]) * RAD_TO_DEG;
-  float p1 = asin(dcm[0][2]) * RAD_TO_DEG;
-  float r1 = atan(dcm[1][2] / dcm[2][2]) * RAD_TO_DEG;
+  float y1 = atan(e.x / n.x) * RAD_TO_DEG;
+  float p1 = atan2(a.x, sqrt(a.y * a.y + a.z * a.z)) * RAD_TO_DEG;
+  float r1 = atan2(-a.y, sqrt(a.x * a.x + a.z * a.z)) * RAD_TO_DEG;
 
-  float deltaT = ((float)(millis() - startT)) / 1000.0f;
+  float newT = millis();
+  float deltaT = ((float)(newT - startT)) / 1000.0f;
+  startT = newT;
+
   float y2 = yaw + (g.z * deltaT);
   float p2 = pitch + (g.y * deltaT);
   float r2 = roll + (g.x * deltaT);
 
-  float y = fuse(-y1, y2, 0.70f);
-  float p = fuse(-p1, p2, 0.70f);
-  float r = fuse(-r1, r2, 0.70f);
+  float y = fuse(-y1, y2, 0.05f);
+  float p = fuse(p1, p2, 0.10f);
+  float r = fuse(r1, r2, 0.10f);
 
   yaw = fuse(yaw, y, 0.10f);
   pitch = fuse(pitch, p, 0.10f);
   roll = fuse(roll, r, 0.10f);
-
-  startT = millis();
 }
 
 void loop() {
